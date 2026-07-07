@@ -1,0 +1,31 @@
+baseURL = "https://go-net-health.github.io/"
+title = "go-net-health"
+disableKinds = ["taxonomy", "term", "RSS", "sitemap", "404"]
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[[params.phases]]
+  name = "TCP & HTTP probes"
+  status = "ready"
+  blurb = "Two stateless probe kinds: `TypeTCP` opens a connection and checks it succeeds; `TypeHTTP` issues a request and checks the response status — configurable path, method and per-probe timeout, accepting any `2xx` by default or an explicit status set."
+[[params.phases]]
+  name = "Health-check semantics"
+  status = "ready"
+  blurb = "The behaviour a real health check needs: the HTTP probe **does not follow redirects** (it checks *this* endpoint, not where it points), surfaces the attempt latency even on failure, and uses a fresh keep-alive-disabled transport per probe so pools don't bleed between targets."
+[[params.phases]]
+  name = "Rolling status & Runner"
+  status = "ready"
+  blurb = "A `Runner` drives a probe on a fixed period, honours a one-shot initial delay, and derives a rolling `Status`: `SuccessThreshold` consecutive passes → `Healthy`, `FailureThreshold` consecutive failures → `Unhealthy`, `Unknown` until a threshold is met. Every attempt emits a `Result` on a buffered channel."
+[[params.phases]]
+  name = "Timeout vs refused"
+  status = "ready"
+  blurb = "`IsTimeout` distinguishes \"the probe never reached the target\" from \"the target actively refused\", so a caller's grace period can apply only to unreachable targets. An injectable clock keeps wall time off the hot path for deterministic tests."
+[[params.phases]]
+  name = "100% coverage · 6 arches"
+  status = "ready"
+  blurb = "Every branch — timeout, connection-refused, redirect-not-followed, threshold roll-over and the buffer-drop safety valve — is covered with loopback `httptest` / `net.Listen` servers and a deterministic fake probe, under `-race`; 100% coverage, `gofmt` + `go vet` clean, green across all six 64-bit Go arches."
+[[params.phases]]
+  name = "EXEC probe"
+  status = "planned"
+  blurb = "`TypeExec` — running a command inside the target — is reserved. It needs an in-target agent channel this stateless network runner has no access to, so it stays out of scope until that channel exists."
